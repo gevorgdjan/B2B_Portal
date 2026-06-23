@@ -4,6 +4,14 @@ from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager["User"]):
+    """
+    Кастомный менеджер для модели пользователя (Паттерн: Factory Method).
+
+    Реализует принцип Single Responsibility (SRP): сама модель User отвечает
+    только за структуру данных (схему БД), а логика создания объектов вынесена сюда.
+    Обеспечивает обязательное криптографическое хэширование пароля через `set_password()`.
+    """
+
     def create_user(
         self, email: str, password: str | None = None, **extra_fields: dict
     ) -> "User":
@@ -31,6 +39,16 @@ class CustomUserManager(BaseUserManager["User"]):
 
 
 class User(AbstractUser):
+    """
+    Кастомная модель пользователя портала.
+
+    Ключевые архитектурные отличия от стандартной модели Django:
+    1. Идентификация происходит по `email` вместо `username`.
+    2. Реализована ролевая система доступа (RBAC) через TextChoices (Enum).
+    3. Присутствует рекурсивная связь (Self-referential ForeignKey) `manager`,
+       позволяющая выстраивать иерархию "Руководитель - Подчиненный".
+    """
+
     class Role(models.TextChoices):
         MANAGER = "MANAGER", _("Менеджер")
         STOREKEEPER = "STOREKEEPER", _("Кладовщик")
@@ -47,6 +65,15 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
+
+    manager = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="subordinates",
+        verbose_name="Руководитель",
+    )
 
     def __str__(self) -> str:
         return f"{self.email} - {self.get_role_display()}"

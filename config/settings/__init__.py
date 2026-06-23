@@ -1,13 +1,12 @@
-from split_settings.tools import include, optional
 import os
 
-# По умолчанию запускаем локальные настройки
+from split_settings.tools import include, optional
+
 ENV = os.getenv('DJANGO_ENV', 'local')
 
 base_settings = [
-    'base.py', # Общие настройки
-    f'{ENV}.py', # Специфичные для среды (local.py или production.py)
+    'base.py',
+    f'{ENV}.py',
 ]
 
-# Склеиваем настройки
 include(*base_settings)

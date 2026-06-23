@@ -10,6 +10,15 @@ logger = logging.getLogger(__name__)
 
 
 class OneCSyncService:
+    """
+    Служба синхронизации остатков с 1С:Предприятие (Паттерны: Adapter / Facade).
+
+    Инкапсулирует логику общения с внешней системой по протоколу OData.
+    Если в будущем компания сменит учетную систему (например, на SAP или МойСклад),
+    потребуется изменить только этот класс, не затрагивая остальную систему
+    (соответствие принципу Open/Closed).
+    """
+
     def __init__(self):
         self.odata_url = getattr(
             settings, "ONEC_ODATA_URL", "http://localhost/1c/odata/standard.odata/"

@@ -1,9 +1,16 @@
 from django.db import models
-
 from pytils.translit import slugify
 
 
 class Product(models.Model):
+    """
+    Модель товарной номенклатуры.
+
+    Содержит метод `save()`, который переопределен для автоматической
+    генерации человекопонятных URL (Slug) с помощью библиотеки pytils.
+    Реализована базовая защита от дублей: если slug занят, к нему добавляется артикул.
+    """
+    
     name = models.CharField('Название товара', max_length=255)
     sku = models.CharField('Артикул', max_length=50, unique=True)
     slug = models.SlugField('URL', max_length=255, unique=True, blank=True)

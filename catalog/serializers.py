@@ -4,6 +4,13 @@ from .models import Product
 
 
 class PriceListUploadSerializer(serializers.Serializer):
+    """
+    Сериализатор (DTO) для валидации входящего файла прайс-листа.
+
+    Обеспечивает первичную безопасность, отсекая файлы с неверным расширением
+    до того, как они попадут в файловую систему и будут переданы в очередь Celery.
+    """
+
     file = serializers.FileField()
 
     def validate_file(self, value):

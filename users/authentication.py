@@ -8,6 +8,15 @@ from .models import User
 
 
 class JWTAuthentication(BaseAuthentication):
+    """
+    Пользовательский класс аутентификации для проверки JWT-токенов.
+
+    Наследует интерфейс BaseAuthentication, реализуя принцип Dependency Inversion.
+    Важная деталь: импорт библиотеки `jwt` (которая использует модули Rust под капотом)
+    выполняется лениво (Lazy Import) внутри метода `authenticate`,
+    чтобы избежать конфликта процессов при старте Celery Worker-ов и выполнении миграций.
+    """
+
     def authenticate(self, request) -> tuple[User, str] | None:
         import jwt
 

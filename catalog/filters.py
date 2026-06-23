@@ -4,6 +4,15 @@ from .models import Product
 
 
 class ProductFilter(django_filters.FilterSet):
+    """
+    Класс инкапсулирует логику сложной фильтрации товаров.
+
+    Использование django_filters позволяет убрать "грязные" проверки
+    вида `request.GET.get('price')` из контроллеров.
+    Позволяет фильтровать по диапазонам (`gte`, `lte`), вхождению текста (`icontains`)
+    и имеет кастомный метод фильтрации `filter_in_stock` для вывода товаров в наличии.
+    """
+    
     name = django_filters.CharFilter(lookup_expr="icontains", label="Поиск по названию")
     sku = django_filters.CharFilter(lookup_expr="iexact", label="Точный артикул")
 

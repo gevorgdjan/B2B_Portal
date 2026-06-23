@@ -10,6 +10,18 @@ from .services import OneCSyncService
 
 @shared_task(bind=True)
 def process_price_list_task(self, file_path: str) -> dict[str, Any]:
+    """
+    Асинхронная задача Celery для обработки Excel-прайсов.
+
+    Алгоритм работы:
+    1. Читает файл через библиотеку Pandas (движок openpyxl).
+    2. Очищает данные от пустых значений (NaN).
+    3. Итерируется по строкам и применяет идемпотентную операцию `update_or_create`,
+       предотвращая создание дубликатов при повторной загрузке файла.
+    4. Очищает временный файл с диска сервера (независимо от успеха или ошибки).
+    Возвращает словарь со статистикой, который сохраняется в Redis (Result Backend).
+    """
+    
     try:
         absolute_path = default_storage.path(file_path)
 
