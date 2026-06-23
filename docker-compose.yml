@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # Брокер сообщений RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine # Берем версию с веб-интерфейсом (-management) и легкую (-alpine)
+    container_name: erp_rabbitmq
+    ports:
+      - "5672:5672"   # Порт для работы Celery (AMQP)
+      - "15672:15672" # Порт для красивой админки RabbitMQ в браузере
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    restart: unless-stopped # Автоматически перезапускать, если контейнер упал
+
+  # База данных/Кэш Redis
+  redis:
+    image: redis:7-alpine
+    container_name: erp_redis
+    ports:
+      - "6379:6379" # Стандартный порт Redis
+    restart: unless-stopped
